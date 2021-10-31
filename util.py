@@ -78,10 +78,10 @@ class Colorize:
 
 class CoE_Dataset(Dataset):
 
-    def __init__(self, root, input_transform=None, target_transform=None, crop_size=192, is_train=True):
+    def __init__(self, root, input_transform=None, target_transform=None, crop_size=192, is_train=True, array=[]):
         self.images_root = os.path.join(root, 'Images')
         self.labels_root = os.path.join(root, 'Labels')
-
+        self.array = array
         self.filenames = [image_basename(f)
             for f in os.listdir(self.labels_root) if is_image(f)]
         
@@ -101,7 +101,7 @@ class CoE_Dataset(Dataset):
 
     def __getitem__(self, index):
         if self.is_train:
-            filename = self.filenames[index%900]
+            filename = self.filenames[self.array[index%900]]
             with open(image_path(self.images_root, filename, '.jpg'), 'rb') as f:
                 image = load_image(f).convert('RGB')
             with open(image_path(self.labels_root, filename, '.png'), 'rb') as f:
@@ -143,9 +143,9 @@ class CoE_Dataset(Dataset):
             if self.target_transform is not None:
                 label = self.target_transform(label)
 
-            image = image + 0*self.noise[index]
+            #image = image + 0*self.noise[index]
         else:
-            filename = self.filenames[900+index]
+            filename = self.filenames[self.array[index]]
             with open(image_path(self.images_root, filename, '.jpg'), 'rb') as f:
                 image = load_image(f).convert('RGB')
             with open(image_path(self.labels_root, filename, '.png'), 'rb') as f:
